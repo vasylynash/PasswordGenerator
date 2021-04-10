@@ -2,6 +2,7 @@
 var generateBtn = document.querySelector("#generate");
 var passwordText = document.querySelector("#password");
 
+//Fill arrays with code vaclues
 let arrayofValues = (start, end) => {
   const array = [];
   for (let i = start; i <= end; i++) {
@@ -10,6 +11,7 @@ let arrayofValues = (start, end) => {
   return array;
 };
 
+//Create arrays with codes for different options
 const UPPERCASE = arrayofValues(65, 90);
 const LOWERCASE = arrayofValues(97, 122);
 const NUMBERS = arrayofValues(48, 57);
@@ -23,56 +25,67 @@ generateBtn.addEventListener("click", writePassword);
 
 // Write password to the #password input
 function writePassword() {
-  let length = getLength();
-  if (length === null) {
+  let password = generatePassword();
+  if (password === null) {
     return;
   }
-  let includeLowercase = confirm("Would you like to include lowercase letters?");;
-  let includeUpperCase = confirm("Would you like to include uppercase letters?");;
-  let includeNumbers = confirm("Would you like to include numbers?");
-  let includeSymbols = confirm("Would you like to include special characters?");
-  if (!includeLowercase && !includeUpperCase && !includeNumbers && !includeSymbols) {
-    alert("You must choose at least one option");
-    writePassword();
-  }
-  let password = generatePassword(length, includeLowercase, includeUpperCase, includeNumbers, includeSymbols);
   passwordText.value = password;
 }
 
-
-
-//todo: user cancels
+//TODO: user cancels
 function getLength() {
   var length = prompt("Please enter the length of the password (8 - 128 characters):");
   if (length === null) {
-    return;
+    return null;
   }
   if (length < 8 || length > 128) {
     alert("Please enter a number between 8 and 128");
-    getLength();
+    return getLength();
   }
   return length;
 }
 
-function generatePassword(length, lowercase, uppercase, numbers, symbols) {
+//Get options for the password generation
+function getOptions() {
+  let options = {};
+  options.lowercase = confirm("Would you like to include lowercase letters?");
+  options.uppercase = confirm("Would you like to include uppercase letters?");
+  options.numbers = confirm("Would you like to include numbers?");
+  options.symbols = confirm("Would you like to include special characters?");
+  if (!options.lowercase && !options.uppercase && !options.numbers && !options.symbols) {
+    alert("You must choose at least one option");
+    return getOptions();
+  }
+  return options;
+}
+
+//Generate password
+function generatePassword() {
+  let length = getLength();
+  if (length === null) {
+    return null;
+  }
+  let options = getOptions();
   let charCodes = [];
-  if (lowercase) {
+
+  if (options.lowercase) {
     charCodes = charCodes.concat(LOWERCASE);
   }
 
-  if (uppercase) {
+  if (options.uppercase) {
     charCodes = charCodes.concat(UPPERCASE);
   }
 
-  if (numbers) {
+  if (options.numbers) {
     charCodes = charCodes.concat(NUMBERS);
   }
 
-  if (symbols) {
+  if (options.symbols) {
     charCodes = charCodes.concat(SYMBOLS);
   }
 
-  const passwordCharacters = [];
+  let passwordCharacters = [];
+
   for (let i = 0; i < length; i++) {
     const characterCode =
       charCodes[Math.floor(Math.random() * charCodes.length)];
